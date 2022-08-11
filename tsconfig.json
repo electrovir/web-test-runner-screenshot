@@ -1,0 +1,6 @@
+{
+    "extends": "./.virmator/tsconfig-base.json",
+    "compilerOptions": {
+        "module": "ES2020"
+    }
+}

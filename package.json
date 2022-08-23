@@ -20,7 +20,7 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "compile": "rm -rf dist && tsc --project tsconfig.json",
-        "format": "virmator format write",
+        "format": "virmator format",
         "prepublishOnly": "npm run compile && npm run test:full",
         "spellcheck": "virmator spellcheck",
         "start": "npm install && vite --force --config .virmator/vite/vite.config.ts",

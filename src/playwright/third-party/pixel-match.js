@@ -1,20 +1,18 @@
 /**
- * 
  * ISC License
  *
  * Copyright (c) 2019, Mapbox
-
- * Permission to use, copy, modify, and/or distribute this software for any purpose
- * with or without fee is hereby granted, provided that the above copyright notice
- * and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
- * REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
- * INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
- * OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
- * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
- * THIS SOFTWARE.
+ * Permission to use, copy, modify, and/or distribute this software for any purpose with or without
+ * fee is hereby granted, provided that the above copyright notice and this permission notice appear
+ * in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+ * SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
+ * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
+ * OF THIS SOFTWARE.
  */
 
 'use strict';
@@ -22,24 +20,32 @@
 module.exports = pixelmatch;
 
 const defaultOptions = {
-    threshold: 0.1,         // matching threshold (0 to 1); smaller is more sensitive
-    includeAA: false,       // whether to skip anti-aliasing detection
-    alpha: 0.1,             // opacity of original image in diff output
-    aaColor: [255, 255, 0], // color of anti-aliased pixels in diff output
-    diffColor: [255, 0, 0], // color of different pixels in diff output
-    diffColorAlt: null,     // whether to detect dark on light differences between img1 and img2 and set an alternative color to differentiate between the two
-    diffMask: false         // draw the diff over a transparent background (a mask)
+    threshold: 0.1, // matching threshold (0 to 1); smaller is more sensitive
+    includeAA: false, // whether to skip anti-aliasing detection
+    alpha: 0.1, // opacity of original image in diff output
+    aaColor: [
+        255,
+        255,
+        0,
+    ], // color of anti-aliased pixels in diff output
+    diffColor: [
+        255,
+        0,
+        0,
+    ], // color of different pixels in diff output
+    diffColorAlt: null, // whether to detect dark on light differences between img1 and img2 and set an alternative color to differentiate between the two
+    diffMask: false, // draw the diff over a transparent background (a mask)
 };
 
 function pixelmatch(img1, img2, output, width, height, options) {
-
     if (!isPixelData(img1) || !isPixelData(img2) || (output && !isPixelData(output)))
         throw new Error('Image data: Uint8Array, Uint8ClampedArray or Buffer expected.');
 
     if (img1.length !== img2.length || (output && output.length !== img1.length))
         throw new Error('Image sizes do not match.');
 
-    if (img1.length !== width * height * 4) throw new Error('Image data size does not match width/height.');
+    if (img1.length !== width * height * 4)
+        throw new Error('Image data size does not match width/height.');
 
     options = Object.assign({}, defaultOptions, options);
 
@@ -50,9 +56,13 @@ function pixelmatch(img1, img2, output, width, height, options) {
     let identical = true;
 
     for (let i = 0; i < len; i++) {
-        if (a32[i] !== b32[i]) { identical = false; break; }
+        if (a32[i] !== b32[i]) {
+            identical = false;
+            break;
+        }
     }
-    if (identical) { // fast path if identical
+    if (identical) {
+        // fast path if identical
         if (output && !options.diffMask) {
             for (let i = 0; i < len; i++) drawGrayPixel(img1, 4 * i, options.alpha, output);
         }
@@ -67,7 +77,6 @@ function pixelmatch(img1, img2, output, width, height, options) {
     // compare each pixel of one image against the other one
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
-
             const pos = (y * width + x) * 4;
 
             // squared YUV distance between colors at this pixel position, negative if the img2 pixel is darker
@@ -76,20 +85,25 @@ function pixelmatch(img1, img2, output, width, height, options) {
             // the color difference is above the threshold
             if (Math.abs(delta) > maxDelta) {
                 // check it's a real rendering difference or just anti-aliasing
-                if (!options.includeAA && (antialiased(img1, x, y, width, height, img2) ||
-                                           antialiased(img2, x, y, width, height, img1))) {
+                if (
+                    !options.includeAA &&
+                    (antialiased(img1, x, y, width, height, img2) ||
+                        antialiased(img2, x, y, width, height, img1))
+                ) {
                     // one of the pixels is anti-aliasing; draw as yellow and do not count as difference
                     // note that we do not include such pixels in a mask
                     if (output && !options.diffMask) drawPixel(output, pos, ...options.aaColor);
-
                 } else {
                     // found substantial difference not caused by anti-aliasing; draw it as such
                     if (output) {
-                        drawPixel(output, pos, ...(delta < 0 && options.diffColorAlt || options.diffColor));
+                        drawPixel(
+                            output,
+                            pos,
+                            ...((delta < 0 && options.diffColorAlt) || options.diffColor),
+                        );
                     }
                     diff++;
                 }
-
             } else if (output) {
                 // pixels are similar; draw background as grayscale image blended with white
                 if (!options.diffMask) drawGrayPixel(img1, pos, options.alpha, output);
@@ -134,13 +148,13 @@ function antialiased(img, x1, y1, width, height, img2) {
                 // if found more than 2 equal siblings, it's definitely not anti-aliasing
                 if (zeroes > 2) return false;
 
-            // remember the darkest pixel
+                // remember the darkest pixel
             } else if (delta < min) {
                 min = delta;
                 minX = x;
                 minY = y;
 
-            // remember the brightest pixel
+                // remember the brightest pixel
             } else if (delta > max) {
                 max = delta;
                 maxX = x;
@@ -154,8 +168,12 @@ function antialiased(img, x1, y1, width, height, img2) {
 
     // if either the darkest or the brightest pixel has 3+ equal siblings in both images
     // (definitely not anti-aliased), this pixel is anti-aliased
-    return (hasManySiblings(img, minX, minY, width, height) && hasManySiblings(img2, minX, minY, width, height)) ||
-           (hasManySiblings(img, maxX, maxY, width, height) && hasManySiblings(img2, maxX, maxY, width, height));
+    return (
+        (hasManySiblings(img, minX, minY, width, height) &&
+            hasManySiblings(img2, minX, minY, width, height)) ||
+        (hasManySiblings(img, maxX, maxY, width, height) &&
+            hasManySiblings(img2, maxX, maxY, width, height))
+    );
 }
 
 // check if a pixel has 3+ adjacent pixels of the same color.
@@ -173,10 +191,13 @@ function hasManySiblings(img, x1, y1, width, height) {
             if (x === x1 && y === y1) continue;
 
             const pos2 = (y * width + x) * 4;
-            if (img[pos] === img[pos2] &&
+            if (
+                img[pos] === img[pos2] &&
                 img[pos + 1] === img[pos2 + 1] &&
                 img[pos + 2] === img[pos2 + 2] &&
-                img[pos + 3] === img[pos2 + 3]) zeroes++;
+                img[pos + 3] === img[pos2 + 3]
+            )
+                zeroes++;
 
             if (zeroes > 2) return true;
         }
@@ -230,9 +251,15 @@ function colorDelta(img1, img2, k, m, yOnly) {
     return y1 > y2 ? -delta : delta;
 }
 
-function rgb2y(r, g, b) { return r * 0.29889531 + g * 0.58662247 + b * 0.11448223; }
-function rgb2i(r, g, b) { return r * 0.59597799 - g * 0.27417610 - b * 0.32180189; }
-function rgb2q(r, g, b) { return r * 0.21147017 - g * 0.52261711 + b * 0.31114694; }
+function rgb2y(r, g, b) {
+    return r * 0.29889531 + g * 0.58662247 + b * 0.11448223;
+}
+function rgb2i(r, g, b) {
+    return r * 0.59597799 - g * 0.2741761 - b * 0.32180189;
+}
+function rgb2q(r, g, b) {
+    return r * 0.21147017 - g * 0.52261711 + b * 0.31114694;
+}
 
 // blend semi-transparent color with white
 function blend(c, a) {
@@ -250,6 +277,6 @@ function drawGrayPixel(img, i, alpha, output) {
     const r = img[i + 0];
     const g = img[i + 1];
     const b = img[i + 2];
-    const val = blend(rgb2y(r, g, b), alpha * img[i + 3] / 255);
+    const val = blend(rgb2y(r, g, b), (alpha * img[i + 3]) / 255);
     drawPixel(output, i, val, val, val);
 }

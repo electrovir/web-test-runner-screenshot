@@ -1,4 +1,11 @@
 {
+    "ignorePaths": [
+        "*.tgz",
+        "./src/playwright/third-party/*.js"
+    ],
     "import": ".virmator/.cspell-base.json",
-    "words": []
+    "words": [
+        "jpegjs",
+        "pngjs"
+    ]
 }

@@ -15,7 +15,14 @@
 import colors from 'colors/safe';
 import jpegjs from 'jpeg-js';
 import {PNG} from 'pngjs';
-import {DIFF_DELETE, DIFF_EQUAL, DIFF_INSERT, diff_match_patch, pixelMatch} from './third-party';
+import {
+    Diff,
+    DIFF_DELETE,
+    DIFF_EQUAL,
+    DIFF_INSERT,
+    diff_match_patch,
+} from './third-party/diff_match_patch';
+import {pixelMatch} from './third-party/pixel-match';
 
 export type ImageComparatorOptions = {
     threshold?: number;
@@ -115,7 +122,7 @@ function compareText(actual: Buffer | string, expectedBuffer: Buffer): Comparato
     };
 }
 
-function diff_prettyTerminal(diffs: diff_match_patch.Diff[]) {
+function diff_prettyTerminal(diffs: Diff[]) {
     const html = [];
     for (let x = 0; x < diffs.length; x++) {
         const op = diffs[x]![0]; // Operation (insert, delete, equal)

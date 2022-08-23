@@ -19,8 +19,6 @@ export const screenshotPlugin: TestRunnerPlugin<ScreenshotPluginPayload> = {
             }
             const browser = session.browser;
 
-            console.log({browser});
-
             // handle specific behavior for playwright
             if (browser.type === 'playwright' && browser instanceof PlaywrightLauncher) {
                 const page = browser.getPage(session.id);

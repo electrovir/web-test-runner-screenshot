@@ -1,6 +1,3 @@
 {
-    "compilerOptions": {
-        "allowJs": true
-    },
     "extends": "./.virmator/tsconfig-base.json"
 }

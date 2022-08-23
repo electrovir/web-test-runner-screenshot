@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ISC License
  *
@@ -14,10 +15,6 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
  * OF THIS SOFTWARE.
  */
-
-'use strict';
-
-module.exports = pixelmatch;
 
 const defaultOptions = {
     threshold: 0.1, // matching threshold (0 to 1); smaller is more sensitive
@@ -37,7 +34,7 @@ const defaultOptions = {
     diffMask: false, // draw the diff over a transparent background (a mask)
 };
 
-function pixelmatch(img1, img2, output, width, height, options) {
+export function pixelMatch(img1, img2, output, width, height, options) {
     if (!isPixelData(img1) || !isPixelData(img2) || (output && !isPixelData(output)))
         throw new Error('Image data: Uint8Array, Uint8ClampedArray or Buffer expected.');
 

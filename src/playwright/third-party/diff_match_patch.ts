@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Diff Match and Patch Copyright 2018 The diff-match-patch Authors.
  * https://github.com/google/diff-match-patch
@@ -13,18 +14,16 @@
  * the License.
  */
 
+export type Diff = any;
+
 /**
  * @file Computes the difference between two texts to create a patch. Applies the patch onto another
  *   text, allowing for errors.
  * @author fraser@google.com (Neil Fraser)
  */
 
-/**
- * Class containing the diff, match and patch methods.
- *
- * @class
- */
-var diff_match_patch = function () {
+/** Class containing the diff, match and patch methods. */
+export const diff_match_patch: (new () => any) & {Diff: any} = function (this: any): any {
     // Defaults.
     // Redefine these in your program to override the defaults.
 
@@ -57,9 +56,9 @@ var diff_match_patch = function () {
  * [DIFF_INSERT, 'Goodbye'], [DIFF_EQUAL, ' world.']] which means: delete 'Hello', add 'Goodbye' and
  * keep ' world.'
  */
-var DIFF_DELETE = -1;
-var DIFF_INSERT = 1;
-var DIFF_EQUAL = 0;
+export const DIFF_DELETE = -1;
+export const DIFF_INSERT = 1;
+export const DIFF_EQUAL = 0;
 
 /**
  * Class representing one diff tuple. Attempts to look like a two-element array (which is what this
@@ -1726,8 +1725,8 @@ diff_match_patch.prototype.patch_make = function (a, opt_b, opt_c) {
     if (typeof a == 'string' && typeof opt_b == 'string' && typeof opt_c == 'undefined') {
         // Method 1: text1, text2
         // Compute diffs from text1 and text2.
-        text1 = /** @type {string} */ (a);
-        diffs = this.diff_main(text1, /** @type {string} */ (opt_b), true);
+        text1 = /** @type {string} */ a;
+        diffs = this.diff_main(text1, /** @type {string} */ opt_b, true);
         if (diffs.length > 2) {
             this.diff_cleanupSemantic(diffs);
             this.diff_cleanupEfficiency(diffs);
@@ -1740,7 +1739,7 @@ diff_match_patch.prototype.patch_make = function (a, opt_b, opt_c) {
     ) {
         // Method 2: diffs
         // Compute text1 from diffs.
-        diffs = /** @type {!!diff_match_patch.Diff[]} */ (a);
+        diffs = /** @type {!!diff_match_patch.Diff[]} */ a;
         text1 = this.diff_text1(diffs);
     } else if (
         typeof a == 'string' &&
@@ -1749,8 +1748,8 @@ diff_match_patch.prototype.patch_make = function (a, opt_b, opt_c) {
         typeof opt_c == 'undefined'
     ) {
         // Method 3: text1, diffs
-        text1 = /** @type {string} */ (a);
-        diffs = /** @type {!!diff_match_patch.Diff[]} */ (opt_b);
+        text1 = /** @type {string} */ a;
+        diffs = /** @type {!!diff_match_patch.Diff[]} */ opt_b;
     } else if (
         typeof a == 'string' &&
         typeof opt_b == 'string' &&
@@ -1759,8 +1758,8 @@ diff_match_patch.prototype.patch_make = function (a, opt_b, opt_c) {
     ) {
         // Method 4: text1, text2, diffs
         // text2 is not used.
-        text1 = /** @type {string} */ (a);
-        diffs = /** @type {!!diff_match_patch.Diff[]} */ (opt_c);
+        text1 = /** @type {string} */ a;
+        diffs = /** @type {!!diff_match_patch.Diff[]} */ opt_c;
     } else {
         throw new Error('Unknown call format to patch_make.');
     }
@@ -2300,5 +2299,3 @@ diff_match_patch.patch_obj.prototype.toString = function () {
     }
     return text.join('').replace(/%20/g, ' ');
 };
-
-module.exports = {diff_match_patch, DIFF_INSERT, DIFF_DELETE, DIFF_EQUAL};

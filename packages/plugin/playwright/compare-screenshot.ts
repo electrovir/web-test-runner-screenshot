@@ -11,7 +11,7 @@ import {
 } from '../shared/compare-screenshot-payload';
 import {ComparisonResult} from '../shared/comparison-result';
 import {comparisonMessages} from '../shared/messages';
-import {getComparator} from './comparators';
+import {imageComparator} from './comparators';
 
 export type CompareScreenshotInputs = {
     location: Locator | Page;
@@ -65,9 +65,7 @@ async function compareScreenshotToFile({
 
     const expected = await readFile(comparisonFilePath);
 
-    const comparator = getComparator('image/png');
-
-    const result = comparator(receivedScreenshot, expected, comparisonOptions);
+    const result = imageComparator(receivedScreenshot, expected, comparisonOptions);
 
     if (result) {
         if (overwriteChangedImage) {

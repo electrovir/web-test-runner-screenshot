@@ -8,7 +8,6 @@
     "import": ".virmator/.cspell-base.json",
     "words": [
         "nocheck",
-        "jpegjs",
         "pngjs"
     ]
 }

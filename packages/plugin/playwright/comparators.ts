@@ -14,11 +14,8 @@
 
 // retrieved from playwright source code
 
-import colors from 'colors/safe';
-import jpegjs from 'jpeg-js';
 import {PNG} from 'pngjs';
 import {ImageComparatorOptions} from '../shared/compare-screenshot-payload';
-import {Diff, diffMatchPatch, DIFF_DELETE, DIFF_EQUAL, DIFF_INSERT} from './third-party/diff-match';
 import {pixelMatch} from './third-party/pixel-match';
 
 export type ComparatorResult = {diff?: Buffer; errorMessage: string} | null;
@@ -28,28 +25,9 @@ export type Comparator = (
     options?: any,
 ) => ComparatorResult;
 
-export function getComparator(mimeType: string): Comparator {
-    if (mimeType === 'image/png') return compareImages.bind(null, 'image/png');
-    if (mimeType === 'image/jpeg') return compareImages.bind(null, 'image/jpeg');
-    if (mimeType === 'text/plain') return compareText;
-    return compareBuffersOrStrings;
-}
+export const imageComparator = comparePngImages;
 
-const JPEG_JS_MAX_BUFFER_SIZE_IN_MB = 5 * 1024; // ~5 GB
-
-function compareBuffersOrStrings(
-    actualBuffer: Buffer | string,
-    expectedBuffer: Buffer,
-): ComparatorResult {
-    if (typeof actualBuffer === 'string') return compareText(actualBuffer, expectedBuffer);
-    if (!actualBuffer || !(actualBuffer instanceof Buffer))
-        return {errorMessage: 'Actual result should be a Buffer or a string.'};
-    if (Buffer.compare(actualBuffer, expectedBuffer)) return {errorMessage: 'Buffers differ'};
-    return null;
-}
-
-function compareImages(
-    mimeType: string,
+function comparePngImages(
     actualBuffer: Buffer | string,
     expectedBuffer: Buffer,
     options: ImageComparatorOptions = {},
@@ -57,14 +35,8 @@ function compareImages(
     if (!actualBuffer || !(actualBuffer instanceof Buffer))
         return {errorMessage: 'Actual result should be a Buffer.'};
 
-    const actual =
-        mimeType === 'image/png'
-            ? PNG.sync.read(actualBuffer)
-            : jpegjs.decode(actualBuffer, {maxMemoryUsageInMB: JPEG_JS_MAX_BUFFER_SIZE_IN_MB});
-    const expected =
-        mimeType === 'image/png'
-            ? PNG.sync.read(expectedBuffer)
-            : jpegjs.decode(expectedBuffer, {maxMemoryUsageInMB: JPEG_JS_MAX_BUFFER_SIZE_IN_MB});
+    const actual = PNG.sync.read(actualBuffer);
+    const expected = PNG.sync.read(expectedBuffer);
     if (expected.width !== actual.width || expected.height !== actual.height) {
         return {
             errorMessage: `Expected an image ${expected.width}px by ${expected.height}px, received ${actual.width}px by ${actual.height}px. `,
@@ -79,6 +51,7 @@ function compareImages(
         expected.height,
         {
             threshold: options.threshold ?? 0.2,
+            includeAA: options.accountForAntiAliasing,
         },
     );
 
@@ -100,37 +73,4 @@ function compareImages(
               diff: PNG.sync.write(diff),
           }
         : null;
-}
-
-function compareText(actual: Buffer | string, expectedBuffer: Buffer): ComparatorResult {
-    if (typeof actual !== 'string') return {errorMessage: 'Actual result should be a string'};
-    const expected = expectedBuffer.toString('utf-8');
-    if (expected === actual) return null;
-    const dmp = new diffMatchPatch();
-    const d = dmp.diff_main(expected, actual);
-    dmp.diff_cleanupSemantic(d);
-    return {
-        errorMessage: diff_prettyTerminal(d),
-    };
-}
-
-function diff_prettyTerminal(diffs: Diff[]) {
-    const html = [];
-    for (let x = 0; x < diffs.length; x++) {
-        const op = diffs[x]![0]; // Operation (insert, delete, equal)
-        const data = diffs[x]![1]; // Text of change.
-        const text = data;
-        switch (op) {
-            case DIFF_INSERT:
-                html[x] = colors.green(text);
-                break;
-            case DIFF_DELETE:
-                html[x] = colors.reset(colors.strikethrough(colors.red(text)));
-                break;
-            case DIFF_EQUAL:
-                html[x] = text;
-                break;
-        }
-    }
-    return html.join('');
 }

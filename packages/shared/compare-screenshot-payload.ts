@@ -4,6 +4,7 @@ export type ImageComparatorOptions = {
     threshold?: number;
     maxDiffPixels?: number;
     maxDiffPixelRatio?: number;
+    accountForAntiAliasing?: boolean;
 };
 
 export type ScreenshotOptions = Omit<PageScreenshotOptions, 'mask' | 'type' | 'path' | 'quality'>;

@@ -2,8 +2,6 @@
 
 A plugin that runs a screenshot comparisons for [`@web/test-runner`](https://modern-web.dev/docs/test-runner/overview/).
 
-# Usage
-
 ## Install
 
 You probably want this as a dev dependency:
@@ -12,7 +10,7 @@ You probably want this as a dev dependency:
 npm i -D web-test-runner-screenshot
 ```
 
-## Plugin usage
+## Plugin assignment
 
 In your [web-test-runner config](https://modern-web.dev/docs/test-runner/cli-and-configuration/#configuration-file) you need to add this package as a plugin. Example for `web-test-runner.config.mjs`:
 
@@ -51,3 +49,7 @@ describe('my test', () => {
 ```
 
 `assertScreenshot` automatically asserts that the screenshots are equal whereas another command, `compareScreenshot`, gives you a result of the comparison which you could use to write your own test function.
+
+## Note on `@web/test-runner-visual-regression`
+
+This is very similar to the [`@web/test-runner-visual-regression`](https://www.npmjs.com/package/@web/test-runner-visual-regression) package in purpose. I like the API of my package here better though. Of course you should feel free to use whichever you want.

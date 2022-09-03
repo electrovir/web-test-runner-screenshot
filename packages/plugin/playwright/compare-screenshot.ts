@@ -1,6 +1,7 @@
 import {Overwrite} from 'augment-vir';
 import {existsSync} from 'fs';
 import {readFile, writeFile} from 'fs/promises';
+import {dirname} from 'path';
 import {Locator, Page} from 'playwright-core';
 import {
     CompareInputsSharedWithPayload,
@@ -8,6 +9,7 @@ import {
     UpdateScreenshotFileStrategyEnum,
 } from '../shared/compare-screenshot-payload';
 import {ComparisonResult} from '../shared/comparison-result';
+import {comparisonMessages} from '../shared/messages';
 import {getComparator} from './comparators';
 
 export type CompareScreenshotInputs = {
@@ -44,13 +46,11 @@ async function compareScreenshotToFile({
     const overwriteChangedImage = screenshotUpdateStrategy === UpdateScreenshotFileStrategyEnum.All;
 
     const initialResult: Omit<ComparisonResult, 'passed' | 'message'> = {
-        path: comparisonFilePath,
+        file: comparisonFilePath,
+        dir: dirname(comparisonFilePath),
     };
 
     if (!existsSync(comparisonFilePath)) {
-        let extraMessage = writeMissingFile
-            ? ' Saved new screenshot to file. Run again to compare.'
-            : '';
         if (writeMissingFile) {
             await writeFile(comparisonFilePath, receivedScreenshot);
         }
@@ -58,7 +58,7 @@ async function compareScreenshotToFile({
         return {
             ...initialResult,
             passed: false,
-            message: `Comparison screenshot file "${comparisonFilePath}" is missing.${extraMessage}`,
+            message: comparisonMessages.missing(writeMissingFile),
         };
     }
 
@@ -69,21 +69,18 @@ async function compareScreenshotToFile({
     const result = comparator(receivedScreenshot, expected, comparisonOptions);
 
     if (result) {
-        const extraMessage = overwriteChangedImage
-            ? ' Overwrote comparison file with new screenshot.'
-            : '';
         if (overwriteChangedImage) {
             await writeFile(comparisonFilePath, receivedScreenshot);
         }
         return {
             ...initialResult,
-            message: `Screenshot differed from comparison image file.${extraMessage}`,
+            message: comparisonMessages.different(overwriteChangedImage),
             passed: false,
         };
     } else {
         return {
             ...initialResult,
-            message: 'Screenshot matched comparison image file.',
+            message: comparisonMessages.matched,
             passed: true,
         };
     }

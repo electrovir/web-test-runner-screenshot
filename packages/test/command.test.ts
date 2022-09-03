@@ -1,42 +1,51 @@
 // make sure this import is from the compiled JS files, not the packages/command source files
 import {assert} from '@open-wc/testing';
-import {getObjectTypedKeys} from 'augment-vir';
-import {compareScreenshot, CompareScreenshotCommandPayload, ComparisonResult} from '../../command';
-import {compareScreenshotCommandName} from '../shared/command-name';
+import {extractErrorMessage} from 'augment-vir';
+import {
+    compareScreenshot,
+    compareScreenshotCommandName,
+    CompareScreenshotCommandPayload,
+    comparisonMessages,
+    ComparisonResult,
+} from '../../command';
 
-async function testOutput(
-    payload: CompareScreenshotCommandPayload,
-    expected: Partial<ComparisonResult>,
-) {
-    const result = await compareScreenshot(payload);
-
-    const expectationKeys = getObjectTypedKeys(expected);
-
-    assert(expectationKeys.length > 0, 'Need at least one expectation.');
-
-    expectationKeys.forEach((key) => {
-        const expectation = expected[key];
-        const actual = result[key];
-
-        assert.strictEqual(
-            actual,
-            expectation,
-            `Result failed to meet expectation for "${key}" key`,
-        );
-    });
-}
-
+type TestResult = Omit<ComparisonResult, 'file'>;
 type TestCase = {
     testName: string;
     payload: CompareScreenshotCommandPayload;
-    expect: Partial<ComparisonResult>;
-};
+} & (
+    | {
+          expect: TestResult;
+      }
+    | {
+          error: string;
+      }
+);
+
+async function testOutput(payload: CompareScreenshotCommandPayload, expected: TestResult) {
+    const actual = await compareScreenshot(payload);
+
+    assert(actual.file.endsWith('.png'), `output screenshot ${actual.file} did not end with .png`);
+
+    assert.deepStrictEqual(
+        {
+            ...expected,
+            file: undefined,
+        },
+        {
+            ...actual,
+            file: undefined,
+        },
+    );
+}
 
 describe(compareScreenshotCommandName, () => {
     const compareTestCases: TestCase[] = [
         {
             testName: 'should pass with basic comparison',
             expect: {
+                message: comparisonMessages.matched,
+                dir: 'test-screenshots/basic-image',
                 passed: true,
             },
             payload: {
@@ -46,17 +55,36 @@ describe(compareScreenshotCommandName, () => {
         {
             testName: 'should pass without file extension',
             expect: {
+                message: comparisonMessages.matched,
+                dir: 'test-screenshots/no-extension',
                 passed: true,
             },
             payload: {
                 path: 'no-extension',
             },
         },
+        {
+            testName: 'should fail with non-png extension',
+            error: 'Error while executing command compare-screenshot with payload {"path":"wrong-extension.jpg"}: Only png screenshots are allowed. Got "jpg". Please change your file extension to "png"',
+            payload: {
+                path: 'wrong-extension.jpg',
+            },
+        },
     ];
 
     compareTestCases.forEach((testCase) => {
         it(testCase.testName, async () => {
-            await testOutput(testCase.payload, testCase.expect);
+            if ('expect' in testCase) {
+                await testOutput(testCase.payload, testCase.expect);
+            } else {
+                let thrownError: unknown;
+                try {
+                    await testOutput(testCase.payload, {} as any);
+                } catch (error) {
+                    thrownError = error;
+                }
+                assert.strictEqual(testCase.error, extractErrorMessage(thrownError));
+            }
         });
     });
 });

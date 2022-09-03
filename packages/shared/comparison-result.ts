@@ -1,5 +1,6 @@
 export type ComparisonResult = {
     passed: boolean;
     message: string;
-    path: string;
+    file: string;
+    dir: string;
 };

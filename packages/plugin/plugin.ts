@@ -6,6 +6,7 @@ import {sanitizeScreenshotFilePath} from './screenshot-file-path';
 import {compareScreenshotCommandName} from './shared/command-name';
 import {CompareScreenshotCommandPayload} from './shared/compare-screenshot-payload';
 import {verifyCompareScreenshotPayload} from './shared/verify-compare-screenshot-payload';
+export * from './shared';
 
 export function screenshotPlugin(
     baseScreenshotDirRaw: string | string[] = '.',

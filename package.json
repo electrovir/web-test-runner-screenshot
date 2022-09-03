@@ -25,11 +25,11 @@
     "scripts": {
         "compile": "rm -rf dist && rm -rf plugin && rm -rf command && tsc --project tsconfig-command.json && tsc --project tsconfig-plugin.json",
         "format": "virmator format",
-        "prepublishOnly": "npm run compile && npm run test:full",
+        "prepublishOnly": "npm run test:full",
         "spellcheck": "virmator spellcheck",
         "start": "npm install && vite --force --config .virmator/vite/vite.config.ts",
         "test": "npm run compile && virmator test-web \"packages/**/*.test.ts\"",
-        "test:full": "npm run test:types && npm test && npm run spellcheck && virmator format check",
+        "test:full": "npm test && npm run test:types && npm run spellcheck && virmator format check",
         "test:types": "tsc --noEmit"
     },
     "dependencies": {

@@ -1,7 +1,9 @@
 {
     "ignorePaths": [
         "*.tgz",
-        "./src/playwright/third-party/*.ts"
+        "./packages/plugin/playwright/third-party/*.ts",
+        "./plugin/",
+        "./command/"
     ],
     "import": ".virmator/.cspell-base.json",
     "words": [

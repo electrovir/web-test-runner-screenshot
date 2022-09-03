@@ -18,13 +18,7 @@ import colors from 'colors/safe';
 import jpegjs from 'jpeg-js';
 import {PNG} from 'pngjs';
 import {ImageComparatorOptions} from '../shared/compare-screenshot-payload';
-import {
-    Diff,
-    DIFF_DELETE,
-    DIFF_EQUAL,
-    DIFF_INSERT,
-    diff_match_patch,
-} from './third-party/diff_match_patch';
+import {Diff, diffMatchPatch, DIFF_DELETE, DIFF_EQUAL, DIFF_INSERT} from './third-party/diff-match';
 import {pixelMatch} from './third-party/pixel-match';
 
 export type ComparatorResult = {diff?: Buffer; errorMessage: string} | null;
@@ -112,7 +106,7 @@ function compareText(actual: Buffer | string, expectedBuffer: Buffer): Comparato
     if (typeof actual !== 'string') return {errorMessage: 'Actual result should be a string'};
     const expected = expectedBuffer.toString('utf-8');
     if (expected === actual) return null;
-    const dmp = new diff_match_patch();
+    const dmp = new diffMatchPatch();
     const d = dmp.diff_main(expected, actual);
     dmp.diff_cleanupSemantic(d);
     return {

@@ -1,6 +1,8 @@
 .DS_Store
 *.tgz
 /Icon?
+/command/
+/plugin/
 coverage/
 dist/
 graphics/

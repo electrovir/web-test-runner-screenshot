@@ -1,3 +1,6 @@
 {
-    "extends": "./.virmator/tsconfig-base.json"
+    "extends": "./.virmator/tsconfig-base.json",
+    "compilerOptions": {
+        "rootDir": "./packages"
+    }
 }

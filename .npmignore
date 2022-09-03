@@ -11,3 +11,6 @@ graphics/
 src/
 test-files/
 tsconfig*.json
+
+/packages/
+/test-screenshots/

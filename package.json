@@ -1,6 +1,6 @@
 {
     "name": "web-test-runner-screenshot",
-    "version": "0.0.0-beta.1",
+    "version": "0.0.0",
     "description": "",
     "keywords": [
         "runner",
@@ -22,30 +22,28 @@
         "name": "electrovir",
         "url": "https://github.com/electrovir"
     },
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
     "scripts": {
-        "compile": "rm -rf dist && tsc --project tsconfig.json",
+        "compile": "rm -rf dist && rm -rf plugin && rm -rf command && tsc --project tsconfig-command.json && tsc --project tsconfig-plugin.json",
         "format": "virmator format",
         "prepublishOnly": "npm run compile && npm run test:full",
         "spellcheck": "virmator spellcheck",
         "start": "npm install && vite --force --config .virmator/vite/vite.config.ts",
-        "test": "virmator test",
+        "test": "npm run compile && virmator test-web \"packages/**/*.test.ts\"",
         "test:full": "npm run test:types && npm test && npm run spellcheck && virmator format check",
         "test:types": "tsc --noEmit"
     },
     "dependencies": {
-        "@playwright/test": "1.25.0",
-        "augment-vir": "2.3.0",
+        "@playwright/test": "1.25.1",
+        "augment-vir": "2.5.1",
         "colors": "1.4.0",
         "jpeg-js": "0.4.4",
-        "mime": "3.0.0",
         "pngjs": "6.0.0"
     },
     "devDependencies": {
+        "@open-wc/testing": "3.1.6",
         "@types/mime": "3.0.1",
-        "@types/node": "18.7.1",
+        "@types/node": "18.7.14",
         "@types/pngjs": "6.0.1",
-        "virmator": "3.0.5"
+        "virmator": "3.0.6"
     }
 }

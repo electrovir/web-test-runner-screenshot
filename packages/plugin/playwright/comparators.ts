@@ -12,9 +12,12 @@
  * the License.
  */
 
+// retrieved from playwright source code
+
 import colors from 'colors/safe';
 import jpegjs from 'jpeg-js';
 import {PNG} from 'pngjs';
+import {ImageComparatorOptions} from '../shared/compare-screenshot-payload';
 import {
     Diff,
     DIFF_DELETE,
@@ -24,11 +27,6 @@ import {
 } from './third-party/diff_match_patch';
 import {pixelMatch} from './third-party/pixel-match';
 
-export type ImageComparatorOptions = {
-    threshold?: number;
-    maxDiffPixels?: number;
-    maxDiffPixelRatio?: number;
-};
 export type ComparatorResult = {diff?: Buffer; errorMessage: string} | null;
 export type Comparator = (
     actualBuffer: Buffer | string,

@@ -2,7 +2,7 @@
 /**
  * ISC License
  *
- * Copyright (c) 2019, Mapbox
+ * Copyright (c) 2019, Mapbox. Modified by electrovir.
  *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with or without
  * fee is hereby granted, provided that the above copyright notice and this permission notice appear
@@ -15,6 +15,8 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
  * OF THIS SOFTWARE.
  */
+
+// retrieved from playwright source code
 
 const defaultOptions = {
     threshold: 0.1, // matching threshold (0 to 1); smaller is more sensitive

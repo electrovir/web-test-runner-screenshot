@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "rootDir": "./packages/plugin",
+        "outDir": "./plugin"
+    },
+    "exclude": [
+        "./packages/command",
+        "./packages/test"
+    ],
+    "extends": "./tsconfig.json"
+}

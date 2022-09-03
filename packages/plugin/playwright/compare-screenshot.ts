@@ -1,4 +1,5 @@
 import {Overwrite} from 'augment-vir';
+import {toPosixPath} from 'augment-vir/dist/cjs/node-only';
 import {existsSync} from 'fs';
 import {readFile, writeFile} from 'fs/promises';
 import {dirname} from 'path';
@@ -46,8 +47,8 @@ async function compareScreenshotToFile({
     const overwriteChangedImage = screenshotUpdateStrategy === UpdateScreenshotFileStrategyEnum.All;
 
     const initialResult: Omit<ComparisonResult, 'passed' | 'message'> = {
-        file: comparisonFilePath,
-        dir: dirname(comparisonFilePath),
+        file: toPosixPath(comparisonFilePath),
+        dir: toPosixPath(dirname(comparisonFilePath)),
     };
 
     if (!existsSync(comparisonFilePath)) {

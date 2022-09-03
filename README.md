@@ -44,7 +44,7 @@ describe('my test', () => {
 
         await assertScreenshot({
             selector: '.screenshot-me',
-            screenshotFilePath: 'my-screenshot.png',
+            path: 'my-screenshot.png',
         });
     });
 });
